@@ -1,0 +1,116 @@
+cmake_minimum_required(VERSION 3.16)
+project(NVMeLib VERSION 1.0.0 LANGUAGES CXX)
+
+# C++ Standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Compiler settings
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    message(STATUS "Using Clang compiler: ${CMAKE_CXX_COMPILER}")
+    if(WIN32)
+        add_compile_options(
+            -Wall
+            -Wextra
+            -Wno-unused-parameter
+            -Wno-missing-field-initializers
+            -Wno-c++98-compat
+            -Wno-c++98-compat-pedantic
+            -Wno-c++98-c++11-compat-binary-literal
+            -Wno-padded
+            -Wno-unsafe-buffer-usage-in-libc-call
+        )
+    else()
+        add_compile_options(
+            -Wall
+            -Wextra
+            -Wpedantic
+            -Werror=return-type
+            -Wno-unused-parameter
+        )
+    endif()
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    message(STATUS "Using GCC compiler: ${CMAKE_CXX_COMPILER}")
+    add_compile_options(
+        -Wall
+        -Wextra
+        -Wpedantic
+    )
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    message(STATUS "Using MSVC compiler")
+    add_compile_options(/W4)
+endif()
+
+# Include directories
+include_directories(${CMAKE_SOURCE_DIR}/header)
+
+# Source files
+set(NVME_SOURCES
+    header/NVMeDevice.cpp
+)
+
+# Header files (for IDE integration)
+set(NVME_HEADERS
+    header/nvme.h
+    header/nvme_abort.h
+    header/nvme_async_event_request.h
+    header/nvme_capacity_management.h
+    header/nvme_controller_data_queue.h
+    header/nvme_device_self_test.h
+    header/nvme_directive_receive.h
+    header/nvme_directive_send.h
+    header/nvme_firmware_commit.h
+    header/nvme_firmware_image_download.h
+    header/nvme_format_nvm.h
+    header/nvme_get_features.h
+    header/nvme_get_log_page.h
+    header/nvme_identify.h
+    header/nvme_keep_alive.h
+    header/nvme_migration_receive.h
+    header/nvme_migration_send.h
+    header/nvme_namespace_attachment.h
+    header/nvme_namespace_management.h
+    header/nvme_pcie_admin_commands.h
+    header/nvme_sanitize.h
+    header/nvme_security.h
+    header/nvme_set_features.h
+)
+
+# Static Library
+add_library(nvme_static STATIC ${NVME_SOURCES} ${NVME_HEADERS})
+target_include_directories(nvme_static PUBLIC ${CMAKE_SOURCE_DIR}/header)
+set_target_properties(nvme_static PROPERTIES OUTPUT_NAME nvme)
+
+# Shared Library (optional)
+option(BUILD_SHARED_LIBS "Build shared library" OFF)
+if(BUILD_SHARED_LIBS)
+    add_library(nvme_shared SHARED ${NVME_SOURCES} ${NVME_HEADERS})
+    target_include_directories(nvme_shared PUBLIC ${CMAKE_SOURCE_DIR}/header)
+    set_target_properties(nvme_shared PROPERTIES OUTPUT_NAME nvme)
+endif()
+
+# Test executable (optional)
+option(BUILD_TESTS "Build test executable" ON)
+if(BUILD_TESTS)
+    add_executable(nvme_test test/main.cpp)
+    target_link_libraries(nvme_test PRIVATE nvme_static)
+endif()
+
+# Install targets
+install(TARGETS nvme_static
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+)
+install(FILES ${NVME_HEADERS} DESTINATION include/nvme)
+
+# Print configuration summary
+message(STATUS "")
+message(STATUS "=== NVMeLib Build Configuration ===")
+message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+message(STATUS "CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER}")
+message(STATUS "CMAKE_CXX_STANDARD: ${CMAKE_CXX_STANDARD}")
+message(STATUS "BUILD_SHARED_LIBS: ${BUILD_SHARED_LIBS}")
+message(STATUS "BUILD_TESTS: ${BUILD_TESTS}")
+message(STATUS "===================================")
+message(STATUS "")
