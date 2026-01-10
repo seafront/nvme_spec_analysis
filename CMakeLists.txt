@@ -108,8 +108,24 @@ if(BUILD_TESTS)
 
     enable_testing()
 
-    add_executable(nvme_test test/main.cpp)
-    target_link_libraries(nvme_test PRIVATE nvme_static GTest::gtest_main)
+    # Test source files
+    set(TEST_SOURCES
+        test/main.cpp
+        test/NVMeDeviceTest.cpp
+        test/IdentifyTest.cpp
+        test/GetSetFeaturesTest.cpp
+        test/GetLogPageTest.cpp
+        test/FirmwareTest.cpp
+        test/NamespaceManagementTest.cpp
+        test/FormatNVMTest.cpp
+        test/SanitizeTest.cpp
+        test/QueueManagementTest.cpp
+        test/MiscCommandsTest.cpp
+        test/StructureSizeTest.cpp
+    )
+
+    add_executable(nvme_test ${TEST_SOURCES})
+    target_link_libraries(nvme_test PRIVATE nvme_static GTest::gtest)
     target_compile_options(nvme_test PRIVATE ${PROJECT_COMPILE_OPTIONS} -Wno-global-constructors -Wno-exit-time-destructors)
 
     include(GoogleTest)
