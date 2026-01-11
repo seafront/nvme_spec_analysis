@@ -374,7 +374,7 @@ bool NVMeDevice::FormatNVM(uint32_t nsid, uint8_t lbaf, FormatNVMSecureErase ses
 // Sanitize
 //=============================================================================
 
-bool NVMeDevice::Sanitize(SanitizeAction action, uint32_t overwritePattern) {
+bool NVMeDevice::Sanitize(Sanitize) {
     if (!IsOpen()) {
         pImpl->SetError("Device not open", 0);
         return false;

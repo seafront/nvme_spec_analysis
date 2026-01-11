@@ -10,7 +10,7 @@ echo ============================================
 echo.
 
 :: Visual Studio 2022 BuildTools 환경 설정
-call "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
+call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
 if %ERRORLEVEL% NEQ 0 (
     echo Failed to setup MSVC environment!
     exit /b 1
@@ -22,7 +22,7 @@ mkdir build
 
 :: CMake Configure
 cmake -S . -B build -G Ninja ^
-    -DCMAKE_BUILD_TYPE=Release ^
+    -DCMAKE_BUILD_TYPE=Debug ^
     -DCMAKE_CXX_COMPILER="C:/Program Files/LLVM/bin/clang-cl.exe" ^
     -DCMAKE_C_COMPILER="C:/Program Files/LLVM/bin/clang-cl.exe" ^
     -DCMAKE_LINKER="C:/Program Files/LLVM/bin/lld-link.exe" ^

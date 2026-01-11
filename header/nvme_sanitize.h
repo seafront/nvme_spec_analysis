@@ -51,9 +51,17 @@ union SanitizeCDW11 {
     uint32_t raw;
 };
 
+
+typedef struct _SanitizeCmdParameter{
+    uint32_t nsid;
+
+    SanitizeCDW10 cdw10;
+    SanitizeCDW11 cdw11;
+} SanitizeCmdParameter;
+
 //=============================================================================
 // Command Specific Status Values (Figure 375)
-//=============================================================================
+//=============================================================5================
 
 /**
  * Sanitize - Command Specific Status Values
