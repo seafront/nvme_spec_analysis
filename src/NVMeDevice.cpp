@@ -374,7 +374,7 @@ bool NVMeDevice::FormatNVM(uint32_t nsid, uint8_t lbaf, FormatNVMSecureErase ses
 // Sanitize
 //=============================================================================
 
-bool NVMeDevice::Sanitize(Sanitize) {
+bool NVMeDevice::Sanitize(SanitizeAction action, uint32_t overwritePattern) {
     if (!IsOpen()) {
         pImpl->SetError("Device not open", 0);
         return false;
@@ -500,6 +500,35 @@ bool NVMeDevice::Abort(uint16_t sqid, uint16_t cid) {
     cdw10.bits.SQID = sqid;
     cdw10.bits.CID = cid;
     cmd.CDW10 = cdw10.raw;
+
+    CompletionQueueEntry cqe{};
+    return SubmitAdminCommand(cmd, cqe);
+}
+
+//=============================================================================
+// Lockdown
+//=============================================================================
+
+bool NVMeDevice::Lockdown(LockdownScope scope, uint8_t ofi, bool prohibit,
+                          LockdownInterface ifc, uint8_t uuidIndex) {
+    if (!IsOpen()) {
+        pImpl->SetError("Device not open", 0);
+        return false;
+    }
+
+    SubmissionQueueEntry cmd{};
+    cmd.CDW0 = static_cast<uint32_t>(AdminOpcode::Lockdown);
+
+    LockdownCDW10 cdw10{};
+    cdw10.bits.SCP = static_cast<uint8_t>(scope);
+    cdw10.bits.PRHBT = prohibit ? 1 : 0;
+    cdw10.bits.IFC = static_cast<uint8_t>(ifc);
+    cdw10.bits.OFI = ofi;
+    cmd.CDW10 = cdw10.raw;
+
+    LockdownCDW14 cdw14{};
+    cdw14.bits.UIDX = uuidIndex;
+    cmd.CDW14 = cdw14.raw;
 
     CompletionQueueEntry cqe{};
     return SubmitAdminCommand(cmd, cqe);

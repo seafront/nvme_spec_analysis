@@ -77,3 +77,8 @@ TEST(StructureSizeTest, DeviceSelfTestCDWs) {
 TEST(StructureSizeTest, AbortCDWs) {
     EXPECT_EQ(sizeof(nvme::AbortCDW10), 4);
 }
+
+TEST(StructureSizeTest, LockdownCDWs) {
+    EXPECT_EQ(sizeof(nvme::LockdownCDW10), 4);
+    EXPECT_EQ(sizeof(nvme::LockdownCDW14), 4);
+}

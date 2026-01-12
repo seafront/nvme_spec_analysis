@@ -21,6 +21,7 @@
 #include "nvme_get_log_page.h"
 #include "nvme_identify.h"
 #include "nvme_keep_alive.h"
+#include "nvme_lockdown.h"
 #include "nvme_migration_receive.h"
 #include "nvme_migration_send.h"
 #include "nvme_namespace_attachment.h"
@@ -57,6 +58,7 @@ enum class AdminOpcode : uint8_t {
     NamespaceAttachment     = 0x15,
     KeepAlive               = 0x18,
     DirectiveSend           = 0x19,
+    Lockdown                = 0x24,
     DirectiveReceive        = 0x1A,
     VirtualizationManagement = 0x1C,
     NVMeMISend              = 0x1D,
@@ -192,6 +194,11 @@ public:
 
     // Abort
     bool Abort(uint16_t sqid, uint16_t cid);
+
+    // Lockdown
+    bool Lockdown(LockdownScope scope, uint8_t ofi, bool prohibit,
+                  LockdownInterface ifc = LockdownInterface::AdminSubmissionQueue,
+                  uint8_t uuidIndex = 0);
 
     //=========================================================================
     // Queue Management (PCIe Transport)

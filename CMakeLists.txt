@@ -134,6 +134,7 @@ if(BUILD_TESTS)
         test/NamespaceManagementTest.cpp
         test/FormatNVMTest.cpp
         test/SanitizeTest.cpp
+        test/LockdownTest.cpp
         test/QueueManagementTest.cpp
         test/MiscCommandsTest.cpp
         test/StructureSizeTest.cpp
