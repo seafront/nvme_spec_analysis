@@ -229,6 +229,11 @@ bool NVMeDevice::FirmwareImageDownload(const void* data, size_t dataSize, uint32
         return false;
     }
 
+    if (data == nullptr) {
+        pImpl->SetError("Invalid data pointer", 0);
+        return false;
+    }
+
     SubmissionQueueEntry cmd{};
     cmd.CDW0 = static_cast<uint32_t>(AdminOpcode::FirmwareImageDownload);
 
