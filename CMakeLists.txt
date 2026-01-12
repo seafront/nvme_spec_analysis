@@ -137,6 +137,7 @@ if(BUILD_TESTS)
         test/LockdownTest.cpp
         test/QueueManagementTest.cpp
         test/MiscCommandsTest.cpp
+        test/VirtualizationManagementTest.cpp
         test/StructureSizeTest.cpp
     )
 

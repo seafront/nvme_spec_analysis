@@ -9,7 +9,13 @@
       "Bash(ls:*)",
       "Bash(git add:*)",
       "Bash(git commit -m \"$\\(cat <<''EOF''\nRefactor tests into separate files per admin command\n\n- Split monolithic test/main.cpp into individual test files\n- NVMeDeviceTest.cpp: lifecycle, move semantics, error handling \\(11 tests\\)\n- IdentifyTest.cpp: Identify controller/namespace \\(5 tests\\)\n- GetSetFeaturesTest.cpp: Get/Set Features \\(8 tests\\)\n- GetLogPageTest.cpp: Get Log Page, SMART, Error logs \\(7 tests\\)\n- FirmwareTest.cpp: Firmware download/commit \\(8 tests\\)\n- NamespaceManagementTest.cpp: NS create/delete/attach/detach \\(12 tests\\)\n- FormatNVMTest.cpp: Format NVM command \\(6 tests\\)\n- SanitizeTest.cpp: Sanitize operations \\(7 tests\\)\n- QueueManagementTest.cpp: IO queue create/delete \\(14 tests\\)\n- MiscCommandsTest.cpp: DeviceSelfTest, Security, KeepAlive, Abort \\(16 tests\\)\n- StructureSizeTest.cpp: CDW structure size verification \\(13 tests\\)\n\nTotal: 107 tests across 15 test suites\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(./build.bat)",
+      "Bash(ctest:*)",
+      "Bash(./nvme_test.exe)",
+      "Bash(./nvme_test.exe:*)",
+      "Bash(git commit:*)",
+      "Bash(tree:*)"
     ]
   }
 }

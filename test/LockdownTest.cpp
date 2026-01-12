@@ -9,7 +9,7 @@ TEST(LockdownTest, LockdownFailsWhenDeviceNotOpen) {
     nvme::NVMeDevice device;
 
     EXPECT_FALSE(device.Lockdown(nvme::LockdownScope::AdminCommandOpcode, 0x00, true));
-}
+}2
 
 TEST(LockdownTest, LockdownProhibitAdminCommandSucceeds) {
     nvme::NVMeDevice device("/dev/nvme0");

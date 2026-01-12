@@ -200,6 +200,12 @@ public:
                   LockdownInterface ifc = LockdownInterface::AdminSubmissionQueue,
                   uint8_t uuidIndex = 0);
 
+    // Virtualization Management
+    bool VirtualizationManagement(VirtualizationAction action, uint16_t controllerId,
+                                  VirtualizationResourceType resourceType = VirtualizationResourceType::VQResources,
+                                  uint16_t numResources = 0,
+                                  uint16_t* numResourcesModified = nullptr);
+
     //=========================================================================
     // Queue Management (PCIe Transport)
     //=========================================================================

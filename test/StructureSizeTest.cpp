@@ -82,3 +82,9 @@ TEST(StructureSizeTest, LockdownCDWs) {
     EXPECT_EQ(sizeof(nvme::LockdownCDW10), 4);
     EXPECT_EQ(sizeof(nvme::LockdownCDW14), 4);
 }
+
+TEST(StructureSizeTest, VirtualizationManagementCDWs) {
+    EXPECT_EQ(sizeof(nvme::VirtualizationManagementCDW10), 4);
+    EXPECT_EQ(sizeof(nvme::VirtualizationManagementCDW11), 4);
+    EXPECT_EQ(sizeof(nvme::VirtualizationManagementCQEDW0), 4);
+}

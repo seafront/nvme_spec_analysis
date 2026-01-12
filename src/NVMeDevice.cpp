@@ -535,6 +535,44 @@ bool NVMeDevice::Lockdown(LockdownScope scope, uint8_t ofi, bool prohibit,
 }
 
 //=============================================================================
+// Virtualization Management
+//=============================================================================
+
+bool NVMeDevice::VirtualizationManagement(VirtualizationAction action, uint16_t controllerId,
+                                          VirtualizationResourceType resourceType,
+                                          uint16_t numResources,
+                                          uint16_t* numResourcesModified) {
+    if (!IsOpen()) {
+        pImpl->SetError("Device not open", 0);
+        return false;
+    }
+
+    SubmissionQueueEntry cmd{};
+    cmd.CDW0 = static_cast<uint32_t>(AdminOpcode::VirtualizationManagement);
+
+    VirtualizationManagementCDW10 cdw10{};
+    cdw10.bits.ACT = static_cast<uint8_t>(action);
+    cdw10.bits.RT = static_cast<uint8_t>(resourceType);
+    cdw10.bits.CNTLID = controllerId;
+    cmd.CDW10 = cdw10.raw;
+
+    VirtualizationManagementCDW11 cdw11{};
+    cdw11.bits.NR = numResources;
+    cmd.CDW11 = cdw11.raw;
+
+    CompletionQueueEntry cqe{};
+    bool result = SubmitAdminCommand(cmd, cqe);
+
+    if (result && numResourcesModified != nullptr) {
+        VirtualizationManagementCQEDW0 dw0{};
+        dw0.raw = cqe.DW0;
+        *numResourcesModified = dw0.bits.NRM;
+    }
+
+    return result;
+}
+
+//=============================================================================
 // Queue Management (PCIe Transport)
 //=============================================================================
 
