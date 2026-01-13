@@ -93,6 +93,10 @@ if(BUILD_SHARED_LIBS)
     set_target_properties(nvme_shared PROPERTIES OUTPUT_NAME nvme)
 endif()
 
+# Debug main executable (for F5 debugging)
+add_executable(debug_main main.cpp)
+target_compile_options(debug_main PRIVATE ${PROJECT_COMPILE_OPTIONS})
+
 # Code coverage option
 option(ENABLE_COVERAGE "Enable code coverage" OFF)
 if(ENABLE_COVERAGE)
