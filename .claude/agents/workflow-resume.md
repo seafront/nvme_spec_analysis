@@ -51,10 +51,10 @@ Resume a failed or interrupted TDD workflow from a specific phase.
 | Resume Phase | Required Input Files |
 |--------------|---------------------|
 | 1 | chunked_text/5.1.x {Command}.md |
-| 2 | docs/requirements/{command}_requirements.md |
-| 3 | docs/test-scenarios/{command}_test_scenarios.md |
+| 2 | docs/requirements/{command}_requirements.csv |
+| 3 | docs/test-scenarios/{command}_test_scenarios.csv |
 | 4 | docs/test-design/{command}_test_design.md |
-| 5 | docs/requirements/{command}_requirements.md |
+| 5 | docs/requirements/{command}_requirements.csv |
 | 6 | test/{CommandName}Test.cpp, header/nvme_{command}.h |
 | 7 | All above + build results |
 

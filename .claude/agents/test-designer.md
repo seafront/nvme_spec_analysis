@@ -12,13 +12,15 @@ Design detailed test cases based on test scenarios following TDD principles. Con
 
 ## Input
 - Command name
-- Test scenarios file: `docs/test-scenarios/{command_name}_test_scenarios.md`
-- Requirements file (for reference): `docs/requirements/{command_name}_requirements.md`
+- Test scenarios CSV: `docs/test-scenarios/{command_name}_test_scenarios.csv`
+- Requirements CSV (for reference): `docs/requirements/{command_name}_requirements.csv`
+- CDW CSV (for reference): `docs/requirements/{command_name}_cdw.csv`
+- Enum CSV (for reference): `docs/requirements/{command_name}_enums.csv`
 
 ## Process
 
-1. **Read the test scenarios document**
-2. **Read the requirements document** (for context)
+1. **Read the test scenarios CSV**
+2. **Read the requirements CSV files** (for context)
 3. **For each test scenario, design detailed test case(s):**
    - Convert TS-xxx → TC-xxx (one scenario may produce multiple test cases)
    - Define concrete test data

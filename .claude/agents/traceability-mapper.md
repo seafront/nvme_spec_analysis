@@ -12,8 +12,9 @@ Create traceability matrix linking requirements, test scenarios, test cases, and
 
 ## Input
 - Command name
-- Requirements: `docs/requirements/{command_name}_requirements.md`
-- Test scenarios: `docs/test-scenarios/{command_name}_test_scenarios.md`
+- Requirements CSV: `docs/requirements/{command_name}_requirements.csv`
+- Test scenarios CSV: `docs/test-scenarios/{command_name}_test_scenarios.csv`
+- Coverage CSV: `docs/test-scenarios/{command_name}_coverage.csv`
 - Test design: `docs/test-design/{command_name}_test_design.md`
 - Verification: `docs/verification/{command_name}_verification.md`
 - Test file: `test/{CommandName}Test.cpp`

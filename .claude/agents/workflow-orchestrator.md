@@ -25,16 +25,21 @@ Execute the following agents in order, ensuring each completes successfully befo
 │                                                                              │
 │  ① spec-to-requirement-analyzer                                             │
 │     Input:  chunked_text/5.1.x {Command}.md                                 │
-│     Output: docs/requirements/{command}_requirements.md                      │
+│     Output: docs/requirements/{command}_requirements.csv                     │
+│             docs/requirements/{command}_info.csv                             │
+│             docs/requirements/{command}_cdw.csv                              │
+│             docs/requirements/{command}_enums.csv                            │
 │                           │                                                  │
 │                           ▼                                                  │
 │  ② requirement-to-test-scenario-writer                                      │
-│     Input:  docs/requirements/{command}_requirements.md                      │
-│     Output: docs/test-scenarios/{command}_test_scenarios.md                  │
+│     Input:  docs/requirements/{command}_requirements.csv                     │
+│     Output: docs/test-scenarios/{command}_test_scenarios.csv                 │
+│             docs/test-scenarios/{command}_coverage.csv                       │
+│             docs/test-scenarios/{command}_summary.csv                        │
 │                           │                                                  │
 │                           ▼                                                  │
 │  ③ test-designer                                                            │
-│     Input:  docs/test-scenarios/{command}_test_scenarios.md                  │
+│     Input:  docs/test-scenarios/{command}_test_scenarios.csv                 │
 │     Output: docs/test-design/{command}_test_design.md                        │
 │                           │                                                  │
 │                           ▼                                                  │
@@ -66,21 +71,28 @@ Execute the following agents in order, ensuring each completes successfully befo
 ```
 1. Verify spec file exists: chunked_text/5.1.x {Command}.md
 2. Invoke spec-to-requirement-analyzer
-3. Verify output: docs/requirements/{command}_requirements.md
+3. Verify outputs:
+   - docs/requirements/{command}_requirements.csv
+   - docs/requirements/{command}_info.csv
+   - docs/requirements/{command}_cdw.csv
+   - docs/requirements/{command}_enums.csv
 4. Log: "Phase 1 Complete - Requirements extracted"
 ```
 
 ### Phase 2: Test Scenario Design
 ```
-1. Verify requirements file exists
+1. Verify requirements CSV exists
 2. Invoke requirement-to-test-scenario-writer
-3. Verify output: docs/test-scenarios/{command}_test_scenarios.md
+3. Verify outputs:
+   - docs/test-scenarios/{command}_test_scenarios.csv
+   - docs/test-scenarios/{command}_coverage.csv
+   - docs/test-scenarios/{command}_summary.csv
 4. Log: "Phase 2 Complete - Test scenarios created"
 ```
 
 ### Phase 3: Test Case Design
 ```
-1. Verify test scenarios file exists
+1. Verify test scenarios CSV exists
 2. Invoke test-designer
 3. Verify output: docs/test-design/{command}_test_design.md
 4. Log: "Phase 3 Complete - Test cases designed"
@@ -153,13 +165,18 @@ Create/update file: `docs/workflow/{command}_workflow_log.md`
 - 빌드 상태: SUCCESS
 
 ## 생성된 파일 목록
-1. docs/requirements/{command}_requirements.md
-2. docs/test-scenarios/{command}_test_scenarios.md
-3. docs/test-design/{command}_test_design.md
-4. test/{CommandName}Test.cpp
-5. header/nvme_{command}.h
-6. docs/traceability/{command}_traceability.md
-7. docs/workflow/{command}_workflow_log.md
+1. docs/requirements/{command}_requirements.csv
+2. docs/requirements/{command}_info.csv
+3. docs/requirements/{command}_cdw.csv
+4. docs/requirements/{command}_enums.csv
+5. docs/test-scenarios/{command}_test_scenarios.csv
+6. docs/test-scenarios/{command}_coverage.csv
+7. docs/test-scenarios/{command}_summary.csv
+8. docs/test-design/{command}_test_design.md
+9. test/{CommandName}Test.cpp
+10. header/nvme_{command}.h
+11. docs/traceability/{command}_traceability.md
+12. docs/workflow/{command}_workflow_log.md
 ```
 
 ### Final Summary

@@ -20,8 +20,8 @@ Check and report the current status of TDD workflow for a given command.
    - Parse last recorded phase and status
 
 2. **Verify output files exist**
-   - Phase 1: `docs/requirements/{command}_requirements.md`
-   - Phase 2: `docs/test-scenarios/{command}_test_scenarios.md`
+   - Phase 1: `docs/requirements/{command}_requirements.csv` (+ info, cdw, enums CSVs)
+   - Phase 2: `docs/test-scenarios/{command}_test_scenarios.csv` (+ coverage, summary CSVs)
    - Phase 3: `docs/test-design/{command}_test_design.md`
    - Phase 4: `test/{CommandName}Test.cpp`
    - Phase 5: `header/nvme_{command}.h`
@@ -36,8 +36,8 @@ Check and report the current status of TDD workflow for a given command.
 === Workflow Status: {Command Name} ===
 
 Phase Status:
-  [✓] Phase 1: Requirements      - docs/requirements/{cmd}_requirements.md
-  [✓] Phase 2: Test Scenarios    - docs/test-scenarios/{cmd}_test_scenarios.md
+  [✓] Phase 1: Requirements      - docs/requirements/{cmd}_requirements.csv
+  [✓] Phase 2: Test Scenarios    - docs/test-scenarios/{cmd}_test_scenarios.csv
   [✓] Phase 3: Test Design       - docs/test-design/{cmd}_test_design.md
   [✗] Phase 4: Test Implementation - MISSING: test/{Cmd}Test.cpp
   [ ] Phase 5: Code Implementation - Not started

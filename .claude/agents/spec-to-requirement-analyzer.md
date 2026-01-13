@@ -32,55 +32,96 @@ Extract and structure requirements from NVMe specification documents. Focus ONLY
    - REQ-002+: Command-specific requirements
    - Each requirement should be testable
 
-## Output
-Create file: `docs/requirements/{command_name}_requirements.md`
+## Output Files (CSV Format)
 
-Use this template:
+### 1. Requirements CSV
+Create file: `docs/requirements/{command_name}_requirements.csv`
 
-```markdown
-# {Command Name} 요구사항
+```csv
+ID,Category,Requirement,Priority,SpecRef,Figure,Testable
+REQ-001,Common,Device가 열려있어야 커맨드 실행 가능,High,Common,,Yes
+REQ-002,Function,커맨드 기본 동작 설명,High,5.1.x,Figure 123,Yes
+REQ-003,Parameter,파라미터 설명,Medium,5.1.x,Figure 123,Yes
+```
 
-## 1. 기본 정보
-- Opcode: 0x??
-- 스펙 섹션: 5.1.x
-- Figure 번호: Figure ???
+**Columns:**
+- `ID`: Unique requirement ID (REQ-XXX)
+- `Category`: Common, Function, Parameter, Error, Structure
+- `Requirement`: 요구사항 설명 (Korean)
+- `Priority`: High, Medium, Low
+- `SpecRef`: 스펙 섹션 번호
+- `Figure`: Figure 번호
+- `Testable`: Yes/No
 
-## 2. Command Dword 구조
+### 2. Command Info CSV
+Create file: `docs/requirements/{command_name}_info.csv`
 
-### CDW10
-| Bits | Field | Description |
-|------|-------|-------------|
-| 31:16 | Reserved | - |
-| 15:08 | FIELD | Description |
+```csv
+Field,Value
+CommandName,{Command Name}
+Opcode,0x??
+SpecSection,5.1.x
+MainFigure,Figure ???
+Description,커맨드 설명
+```
 
-### CDW11 (if applicable)
-...
+### 3. CDW Structure CSV
+Create file: `docs/requirements/{command_name}_cdw.csv`
 
-### CDW14 (if applicable)
-...
+```csv
+CDW,Bits,Field,Type,Description
+CDW10,31:16,Reserved,Reserved,-
+CDW10,15:08,FIELD1,uint8_t,필드 설명
+CDW10,07:00,FIELD2,uint8_t,필드 설명
+CDW11,31:00,FIELD3,uint32_t,필드 설명
+```
 
-## 3. Enum 정의
+**Columns:**
+- `CDW`: Command Dword (CDW10, CDW11, CDW14, etc.)
+- `Bits`: Bit range (31:16, 07:00, etc.)
+- `Field`: Field name
+- `Type`: Data type or Reserved
+- `Description`: 필드 설명
 
-### {EnumName}
-| Value | Name | Description |
-|-------|------|-------------|
-| 0x00 | Name1 | Description |
+### 4. Enum CSV
+Create file: `docs/requirements/{command_name}_enums.csv`
 
-## 4. Status Codes
-| Value | Name | Description |
-|-------|------|-------------|
-| 0x28 | StatusName | Description |
+```csv
+EnumName,Value,Name,Description
+{EnumName},0x00,Value1,설명
+{EnumName},0x01,Value2,설명
+StatusCode,0x28,ErrorName,에러 설명
+```
 
-## 5. 기능 요구사항
+**Columns:**
+- `EnumName`: Enum 타입명
+- `Value`: 값 (hex)
+- `Name`: 상수명
+- `Description`: 설명
 
-| ID | 요구사항 | 우선순위 | 스펙 참조 |
-|----|----------|----------|-----------|
-| REQ-001 | Device가 열려있어야 커맨드 실행 가능 | High | Common |
-| REQ-002 | ... | Medium | Figure ??? |
+## Example Output
+
+For "Lockdown" command:
+
+**lockdown_requirements.csv:**
+```csv
+ID,Category,Requirement,Priority,SpecRef,Figure,Testable
+REQ-001,Common,Device가 열려있어야 커맨드 실행 가능,High,Common,,Yes
+REQ-002,Function,Lockdown 커맨드는 인터페이스별 잠금 설정,High,5.1.14,Figure 308,Yes
+REQ-003,Parameter,Scope 값에 따라 잠금 범위 결정,High,5.1.14,Figure 308,Yes
+REQ-004,Parameter,Interface Lock 값 설정,Medium,5.1.14,Figure 308,Yes
+```
+
+**lockdown_cdw.csv:**
+```csv
+CDW,Bits,Field,Type,Description
+CDW10,31:08,Reserved,Reserved,-
+CDW10,07:04,IFACE,uint8_t,Interface Lock 값
+CDW10,03:00,SCP,uint8_t,Scope 값
 ```
 
 ## Guidelines
-- Use Korean for documentation
+- Use Korean for descriptions
 - Reference Figure numbers from spec
 - Each requirement must be:
   - Unique (no duplicates)
@@ -88,3 +129,5 @@ Use this template:
   - Traceable (linked to spec section/figure)
 - Include all CDW fields even if reserved
 - Do NOT include test scenarios - that is handled by a separate agent
+- CSV files must be UTF-8 encoded
+- Escape commas in descriptions with quotes
