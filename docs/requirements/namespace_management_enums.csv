@@ -1,0 +1,10 @@
+EnumName,Value,Name,Description
+NamespaceManagementSelect,0x00,Create,네임스페이스 생성
+NamespaceManagementSelect,0x01,Delete,네임스페이스 삭제
+NamespaceManagementSelect,0x02-0x0F,Reserved,예약됨
+StatusCode,0x0A,InvalidFormat,"지원되지 않는 User Data Format 지정: (1) 잘못된 포맷 번호, (2) 메타데이터 리소스 부족으로 보호 정보 활성화 불가, (3) 현재 구성에서 사용 불가능한 포맷"
+StatusCode,0x15,NamespaceInsufficientCapacity,"네임스페이스 생성에 필요한 미할당 용량 부족. Error Information Log Entry의 Command Specific Information 필드에 필요한 총 용량(바이트) 명시"
+StatusCode,0x16,NamespaceIdentifierUnavailable,지원 가능한 네임스페이스 개수 초과
+StatusCode,0x1B,ThinProvisioningNotSupported,컨트롤러가 Thin Provisioning 미지원
+StatusCode,0x24,ANAGroupIdentifierInvalid,"지정된 ANA Group Identifier(ANAGRPID) 미지원: (a) 존재하지 않는 ANAGRPID, (b) 컨트롤러가 ANAGRPID 지정 불가(ANACAP의 ANAGIDS 비트가 0), (c) 컨트롤러가 해당 ANAGRPID 미지원(값이 ANAGRPMAX 초과). ANAGRPID를 0h로 재시도 가능"
+StatusCode,0x29,IOCommandSetNotSupported,Create 작업에서 지정한 I/O Command Set을 컨트롤러가 미지원

@@ -1,0 +1,6 @@
+Field,Value
+CommandName,Namespace Management
+Opcode,0x0D
+SpecSection,5.1.21
+MainFigure,Figure 367-372
+Description,네임스페이스 생성 및 삭제 관리 커맨드. 네임스페이스 attach/detach는 Namespace Attachment 커맨드 사용.

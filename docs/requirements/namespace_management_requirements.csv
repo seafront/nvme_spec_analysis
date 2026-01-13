@@ -1,0 +1,34 @@
+ID,Category,Requirement,Priority,SpecRef,Figure,Testable
+REQ-001,Common,Device가 열려있어야 커맨드 실행 가능,High,Common,,Yes
+REQ-002,Function,Namespace Management 커맨드는 네임스페이스 생성 및 삭제 관리 수행,High,5.1.21,Figure 368,Yes
+REQ-003,Function,Namespace Management 커맨드가 지원되면 Namespace Attachment 커맨드도 반드시 지원,High,5.1.21,,Yes
+REQ-004,Function,Exported NVM subsystem의 컨트롤러는 Namespace Management 커맨드 미지원,High,5.1.21,,Yes
+REQ-005,Function,I/O Submission Queue에 제출된 커맨드는 Namespace Management 작업 중에도 계속 실행,Medium,5.1.21,,Yes
+REQ-006,Function,Create 작업은 네임스페이스를 컨트롤러에 자동 attach하지 않음 (별도 Namespace Attachment 커맨드 필요),High,5.1.21,,Yes
+REQ-007,Function,Delete 작업의 부작용으로 네임스페이스가 모든 컨트롤러에서 자동 detach됨,High,5.1.21,,Yes
+REQ-008,Function,네임스페이스 삭제 전 모든 컨트롤러에서 detach하는 것을 권장,Medium,5.1.21,,Yes
+REQ-009,Function,모든 컨트롤러에서 detach하지 않고 삭제 시 Attached Namespace Attribute Changed 비동기 이벤트 보고,Medium,5.1.21,,Yes
+REQ-010,Function,네임스페이스 삭제 시 Allocated Namespace Attribute Changed 비동기 이벤트 보고,Medium,5.1.21,,Yes
+REQ-011,Parameter,Create 작업 시 NSID 필드를 0h로 설정 (컨트롤러가 사용 가능한 NSID 선택),High,5.1.21,,Yes
+REQ-012,Parameter,Delete 작업 시 NSID 필드에 삭제할 네임스페이스 ID 지정,High,5.1.21,,Yes
+REQ-013,Parameter,NSID에 FFFFFFFFh 지정 시 NVM subsystem의 모든 네임스페이스 삭제,High,5.1.21,,Yes
+REQ-014,Parameter,NSID=FFFFFFFFh이고 유효한 네임스페이스가 0개면 커맨드 성공 완료,Medium,5.1.21,,Yes
+REQ-015,Parameter,SEL 필드로 관리 작업 타입 선택 (0h=Create / 1h=Delete),High,5.1.21,Figure 368,Yes
+REQ-016,Parameter,SEL 값 2h~Fh는 Reserved,Low,5.1.21,Figure 368,Yes
+REQ-017,Parameter,Create 작업(SEL=0h) 시 CSI 필드로 I/O Command Set 지정 (0h=NVM Command Set),High,5.1.21,Figure 369,Yes
+REQ-018,Parameter,Create가 아닌 작업에서 CSI 필드는 Reserved,Low,5.1.21,Figure 369,Yes
+REQ-019,Structure,Create 작업 시 Data Pointer는 데이터 버퍼 시작 지정,High,5.1.21,Figure 367,Yes
+REQ-020,Structure,Data Pointer는 PRP List 불가 (데이터 버퍼가 한 페이지 경계를 넘지 않아야 함),High,5.1.21,Figure 367,Yes
+REQ-021,Structure,Delete 작업 시 데이터 구조 전송 없음,Medium,5.1.21,,Yes
+REQ-022,Structure,Create 작업용 데이터 구조는 512바이트(SIOCS) + 512바이트(Reserved) + 3072바이트(VS)로 구성,High,5.1.21,Figure 370,Yes
+REQ-023,Structure,데이터 구조의 SIOCS 필드는 I/O Command Set 스펙 참조,Medium,5.1.21,Figure 370,Yes
+REQ-024,Structure,데이터 구조의 Vendor Specific 필드는 바이트 1024-4095,Low,5.1.21,Figure 370,Yes
+REQ-025,Structure,Create 작업 완료 시 Completion Queue Entry의 Dword 0에 생성된 NSID 반환,High,5.1.21,Figure 372,Yes
+REQ-026,Structure,Create가 아닌 작업의 CQE Dword 0은 Reserved,Low,5.1.21,Figure 372,Yes
+REQ-027,Error,Invalid Format 상태 코드(0x0A): 지원되지 않는 User Data Format 지정,High,5.1.21,Figure 371,Yes
+REQ-028,Error,Namespace Insufficient Capacity 상태 코드(0x15): 미할당 용량 부족,High,5.1.21,Figure 371,Yes
+REQ-029,Error,Namespace Insufficient Capacity 시 Error Info Log Entry에 필요 용량(바이트) 명시,Medium,5.1.21,Figure 371,Yes
+REQ-030,Error,Namespace Identifier Unavailable 상태 코드(0x16): 네임스페이스 개수 초과,High,5.1.21,Figure 371,Yes
+REQ-031,Error,Thin Provisioning Not Supported 상태 코드(0x1B): Thin Provisioning 미지원,Medium,5.1.21,Figure 371,Yes
+REQ-032,Error,ANA Group Identifier Invalid 상태 코드(0x24): ANAGRPID 미지원,Medium,5.1.21,Figure 371,Yes
+REQ-033,Error,I/O Command Set Not Supported 상태 코드(0x29): Create 시 I/O Command Set 미지원,High,5.1.21,Figure 371,Yes

@@ -1,0 +1,8 @@
+CDW,Bits,Field,Type,Description
+NSID,31:00,NSID,uint32_t,"Create 시 0h (컨트롤러가 자동 할당), Delete 시 삭제할 NSID 지정 (FFFFFFFFh는 모든 네임스페이스 삭제)"
+CDW10,03:00,SEL,uint8_t,관리 작업 타입 선택 (0h=Create / 1h=Delete)
+CDW10,31:04,Reserved,Reserved,-
+CDW11,23:00,Reserved,Reserved,-
+CDW11,31:24,CSI,uint8_t,"Create 작업 시 I/O Command Set 지정 (0h=NVM Command Set), 다른 작업에서는 Reserved"
+DPTR,127:00,DPTR,Data Pointer,"Create 작업 시 데이터 버퍼 시작 주소. PRP List 불가 (한 페이지 경계 이내), Delete 작업 시 데이터 전송 없음"
+CQE_DW0,31:00,NSID,uint32_t,Create 작업 완료 시 생성된 Namespace Identifier 반환 (다른 작업에서는 Reserved)
