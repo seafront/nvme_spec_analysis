@@ -88,3 +88,28 @@ TEST(StructureSizeTest, VirtualizationManagementCDWs) {
     EXPECT_EQ(sizeof(nvme::VirtualizationManagementCDW11), 4);
     EXPECT_EQ(sizeof(nvme::VirtualizationManagementCQEDW0), 4);
 }
+
+TEST(StructureSizeTest, NvmReadCDWs) {
+    EXPECT_EQ(sizeof(nvme::ReadCDW10), 4);
+    EXPECT_EQ(sizeof(nvme::ReadCDW11), 4);
+    EXPECT_EQ(sizeof(nvme::ReadCDW12), 4);
+    EXPECT_EQ(sizeof(nvme::ReadCDW13), 4);
+    EXPECT_EQ(sizeof(nvme::ReadCDW14), 4);
+    EXPECT_EQ(sizeof(nvme::ReadCDW15), 4);
+}
+
+TEST(StructureSizeTest, NvmWriteCDWs) {
+    EXPECT_EQ(sizeof(nvme::WriteCDW10), 4);
+    EXPECT_EQ(sizeof(nvme::WriteCDW11), 4);
+    EXPECT_EQ(sizeof(nvme::WriteCDW12), 4);
+    EXPECT_EQ(sizeof(nvme::WriteCDW13), 4);
+    EXPECT_EQ(sizeof(nvme::WriteCDW14), 4);
+    EXPECT_EQ(sizeof(nvme::WriteCDW15), 4);
+}
+
+TEST(StructureSizeTest, DatasetManagementCDWs) {
+    EXPECT_EQ(sizeof(nvme::DatasetManagementCDW10), 4);
+    EXPECT_EQ(sizeof(nvme::DatasetManagementCDW11), 4);
+    EXPECT_EQ(sizeof(nvme::DatasetManagementRange), 16);
+    EXPECT_EQ(sizeof(nvme::DSMContextAttributes), 4);
+}

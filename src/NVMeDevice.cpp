@@ -668,6 +668,125 @@ bool NVMeDevice::DeleteIOSubmissionQueue(uint16_t qid) {
 }
 
 //=============================================================================
+// Internal I/O Command Submission
+//=============================================================================
+
+bool NVMeDevice::SubmitIOCommand(const SubmissionQueueEntry& cmd, CompletionQueueEntry& cqe,
+                                  void* data, size_t dataSize, bool isWrite) {
+    // TODO: Implement I/O command submission
+    (void)cmd;
+    (void)data;
+    (void)dataSize;
+    (void)isWrite;
+    std::memset(&cqe, 0, sizeof(cqe));
+    return true;
+}
+
+//=============================================================================
+// NVM Commands (I/O Commands)
+//=============================================================================
+
+bool NVMeDevice::Read(uint32_t nsid, uint64_t slba, uint16_t nlb, void* data, size_t dataSize,
+                      bool fua, bool lr) {
+    if (!IsOpen()) {
+        pImpl->SetError("Device not open", 0);
+        return false;
+    }
+
+    if (data == nullptr) {
+        pImpl->SetError("Invalid data pointer", 0);
+        return false;
+    }
+
+    SubmissionQueueEntry cmd{};
+    cmd.CDW0 = static_cast<uint32_t>(NvmOpcode::Read);
+    cmd.NSID = nsid;
+
+    ReadCDW10 cdw10{};
+    cdw10.bits.SLBA_Lower = static_cast<uint32_t>(slba & 0xFFFFFFFF);
+    cmd.CDW10 = cdw10.raw;
+
+    ReadCDW11 cdw11{};
+    cdw11.bits.SLBA_Upper = static_cast<uint32_t>((slba >> 32) & 0xFFFFFFFF);
+    cmd.CDW11 = cdw11.raw;
+
+    ReadCDW12 cdw12{};
+    cdw12.bits.NLB = nlb;
+    cdw12.bits.FUA = fua ? 1 : 0;
+    cdw12.bits.LR = lr ? 1 : 0;
+    cmd.CDW12 = cdw12.raw;
+
+    CompletionQueueEntry cqe{};
+    return SubmitIOCommand(cmd, cqe, data, dataSize, false);
+}
+
+bool NVMeDevice::Write(uint32_t nsid, uint64_t slba, uint16_t nlb, const void* data, size_t dataSize,
+                       bool fua, bool lr) {
+    if (!IsOpen()) {
+        pImpl->SetError("Device not open", 0);
+        return false;
+    }
+
+    if (data == nullptr) {
+        pImpl->SetError("Invalid data pointer", 0);
+        return false;
+    }
+
+    SubmissionQueueEntry cmd{};
+    cmd.CDW0 = static_cast<uint32_t>(NvmOpcode::Write);
+    cmd.NSID = nsid;
+
+    WriteCDW10 cdw10{};
+    cdw10.bits.SLBA_Lower = static_cast<uint32_t>(slba & 0xFFFFFFFF);
+    cmd.CDW10 = cdw10.raw;
+
+    WriteCDW11 cdw11{};
+    cdw11.bits.SLBA_Upper = static_cast<uint32_t>((slba >> 32) & 0xFFFFFFFF);
+    cmd.CDW11 = cdw11.raw;
+
+    WriteCDW12 cdw12{};
+    cdw12.bits.NLB = nlb;
+    cdw12.bits.FUA = fua ? 1 : 0;
+    cdw12.bits.LR = lr ? 1 : 0;
+    cmd.CDW12 = cdw12.raw;
+
+    CompletionQueueEntry cqe{};
+    return SubmitIOCommand(cmd, cqe, const_cast<void*>(data), dataSize, true);
+}
+
+bool NVMeDevice::DatasetManagement(uint32_t nsid, const DatasetManagementRange* ranges, uint8_t numRanges,
+                                   bool deallocate, bool integralRead, bool integralWrite) {
+    if (!IsOpen()) {
+        pImpl->SetError("Device not open", 0);
+        return false;
+    }
+
+    if (ranges == nullptr || numRanges == 0) {
+        pImpl->SetError("Invalid range data", 0);
+        return false;
+    }
+
+    SubmissionQueueEntry cmd{};
+    cmd.CDW0 = static_cast<uint32_t>(NvmOpcode::DatasetManagement);
+    cmd.NSID = nsid;
+
+    DatasetManagementCDW10 cdw10{};
+    cdw10.bits.NR = numRanges - 1;  // 0's based value
+    cmd.CDW10 = cdw10.raw;
+
+    DatasetManagementCDW11 cdw11{};
+    cdw11.bits.IDR = integralRead ? 1 : 0;
+    cdw11.bits.IDW = integralWrite ? 1 : 0;
+    cdw11.bits.AD = deallocate ? 1 : 0;
+    cmd.CDW11 = cdw11.raw;
+
+    size_t dataSize = static_cast<size_t>(numRanges) * sizeof(DatasetManagementRange);
+
+    CompletionQueueEntry cqe{};
+    return SubmitIOCommand(cmd, cqe, const_cast<DatasetManagementRange*>(ranges), dataSize, true);
+}
+
+//=============================================================================
 // Utility Methods
 //=============================================================================
 

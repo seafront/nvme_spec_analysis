@@ -143,6 +143,7 @@ if(BUILD_TESTS)
         test/MiscCommandsTest.cpp
         test/VirtualizationManagementTest.cpp
         test/StructureSizeTest.cpp
+        test/NvmCommandsTest.cpp
     )
 
     add_executable(nvme_test ${TEST_SOURCES})

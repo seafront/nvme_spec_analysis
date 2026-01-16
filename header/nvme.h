@@ -30,6 +30,7 @@
 #include "nvme_security.h"
 #include "nvme_set_features.h"
 #include "nvme_pcie_admin_commands.h"
+#include "nvme_nvm_commands.h"
 
 namespace nvme {
 
@@ -70,6 +71,25 @@ enum class AdminOpcode : uint8_t {
     SecurityReceive         = 0x82,
     Sanitize                = 0x84,
     GetLBAStatus            = 0x86,
+};
+
+/**
+ * NVM Command Opcodes (I/O Commands)
+ */
+enum class NvmOpcode : uint8_t {
+    Flush             = 0x00,
+    Write             = 0x01,
+    Read              = 0x02,
+    WriteUncorrectable = 0x04,
+    Compare           = 0x05,
+    WriteZeroes       = 0x08,
+    DatasetManagement = 0x09,
+    Verify            = 0x0C,
+    ReservationRegister = 0x0D,
+    ReservationReport   = 0x0E,
+    ReservationAcquire  = 0x11,
+    ReservationRelease  = 0x15,
+    Copy              = 0x19,
 };
 
 //=============================================================================
@@ -215,6 +235,22 @@ public:
     bool DeleteIOSubmissionQueue(uint16_t qid);
 
     //=========================================================================
+    // NVM Commands (I/O Commands)
+    //=========================================================================
+
+    // Read
+    bool Read(uint32_t nsid, uint64_t slba, uint16_t nlb, void* data, size_t dataSize,
+              bool fua = false, bool lr = false);
+
+    // Write
+    bool Write(uint32_t nsid, uint64_t slba, uint16_t nlb, const void* data, size_t dataSize,
+               bool fua = false, bool lr = false);
+
+    // Dataset Management (DSM / TRIM)
+    bool DatasetManagement(uint32_t nsid, const DatasetManagementRange* ranges, uint8_t numRanges,
+                           bool deallocate = true, bool integralRead = false, bool integralWrite = false);
+
+    //=========================================================================
     // Utility Methods
     //=========================================================================
     std::string GetLastErrorString() const;
@@ -228,6 +264,8 @@ private:
     bool SubmitAdminCommand(const SubmissionQueueEntry& cmd, CompletionQueueEntry& cqe);
     bool SubmitAdminCommand(const SubmissionQueueEntry& cmd, CompletionQueueEntry& cqe,
                            void* data, size_t dataSize, bool isWrite);
+    bool SubmitIOCommand(const SubmissionQueueEntry& cmd, CompletionQueueEntry& cqe,
+                         void* data, size_t dataSize, bool isWrite);
 };
 
 //=============================================================================
