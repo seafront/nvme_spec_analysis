@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <cstring>
 #include "nvme.h"
 
 //=============================================================================
@@ -76,45 +77,149 @@ TEST(NvmWriteTest, WriteFailsWithNullBuffer) {
     EXPECT_FALSE(device.Write(1, 0, 0, nullptr, 4096));
 }
 
-TEST(NvmWriteTest, WriteSucceedsWithValidParameters) {
+TEST(NvmWriteTest, WriteAndReadBackVerify) {
+    // Given: A device is open and write buffer is prepared with test pattern
     nvme::NVMeDevice device("/dev/nvme0");
-    uint8_t buffer[4096] = {0};
+    constexpr size_t blockSize = 4096;
+    uint8_t writeBuffer[blockSize];
+    uint8_t readBuffer[blockSize];
 
-    // Write 1 block (nlb=0 means 1 block) to LBA 0
-    EXPECT_TRUE(device.Write(1, 0, 0, buffer, sizeof(buffer)));
+    // Fill write buffer with test pattern
+    for (size_t i = 0; i < blockSize; ++i) {
+        writeBuffer[i] = static_cast<uint8_t>(i & 0xFF);
+    }
+    std::memset(readBuffer, 0, blockSize);
+
+    // When: Write 1 block to LBA 0, then read it back
+    ASSERT_TRUE(device.Write(1, 0, 0, writeBuffer, blockSize));
+    ASSERT_TRUE(device.Read(1, 0, 0, readBuffer, blockSize));
+
+    // Then: Read data shall match written data
+    EXPECT_EQ(std::memcmp(writeBuffer, readBuffer, blockSize), 0);
 }
 
-TEST(NvmWriteTest, WriteWithFUA) {
+TEST(NvmWriteTest, WriteAndReadBackVerifyWithFUA) {
+    // Given: A device is open with FUA (Force Unit Access) enabled
     nvme::NVMeDevice device("/dev/nvme0");
-    uint8_t buffer[4096] = {0};
+    constexpr size_t blockSize = 4096;
+    uint8_t writeBuffer[blockSize];
+    uint8_t readBuffer[blockSize];
 
-    // Write with Force Unit Access
-    EXPECT_TRUE(device.Write(1, 0, 0, buffer, sizeof(buffer), true, false));
+    // Fill write buffer with unique pattern
+    for (size_t i = 0; i < blockSize; ++i) {
+        writeBuffer[i] = static_cast<uint8_t>((i * 7) & 0xFF);
+    }
+    std::memset(readBuffer, 0, blockSize);
+
+    // When: Write with FUA, then read back with FUA
+    ASSERT_TRUE(device.Write(1, 0, 0, writeBuffer, blockSize, true, false));
+    ASSERT_TRUE(device.Read(1, 0, 0, readBuffer, blockSize, true, false));
+
+    // Then: Read data shall match written data
+    EXPECT_EQ(std::memcmp(writeBuffer, readBuffer, blockSize), 0);
 }
 
-TEST(NvmWriteTest, WriteWithLimitedRetry) {
+TEST(NvmWriteTest, WriteAndReadBackMultipleBlocks) {
+    // Given: A device is open and multi-block write buffer is prepared
     nvme::NVMeDevice device("/dev/nvme0");
-    uint8_t buffer[4096] = {0};
+    constexpr size_t blockSize = 4096;
+    constexpr uint16_t numBlocks = 4;  // nlb is 0's based, so 3 means 4 blocks
+    constexpr size_t totalSize = blockSize * numBlocks;
+    uint8_t writeBuffer[totalSize];
+    uint8_t readBuffer[totalSize];
 
-    // Write with Limited Retry
-    EXPECT_TRUE(device.Write(1, 0, 0, buffer, sizeof(buffer), false, true));
+    // Fill write buffer with block-specific pattern
+    for (size_t i = 0; i < totalSize; ++i) {
+        writeBuffer[i] = static_cast<uint8_t>((i / blockSize) ^ (i & 0xFF));
+    }
+    std::memset(readBuffer, 0, totalSize);
+
+    // When: Write 4 blocks (nlb=3) starting from LBA 0, then read them back
+    ASSERT_TRUE(device.Write(1, 0, numBlocks - 1, writeBuffer, totalSize));
+    ASSERT_TRUE(device.Read(1, 0, numBlocks - 1, readBuffer, totalSize));
+
+    // Then: All blocks read shall match written data
+    EXPECT_EQ(std::memcmp(writeBuffer, readBuffer, totalSize), 0);
 }
 
-TEST(NvmWriteTest, WriteMultipleBlocks) {
+TEST(NvmWriteTest, WriteAndReadBackAtDifferentLBA) {
+    // Given: A device is open
     nvme::NVMeDevice device("/dev/nvme0");
-    uint8_t buffer[8192] = {0};
+    constexpr size_t blockSize = 4096;
+    uint8_t writeBuffer[blockSize];
+    uint8_t readBuffer[blockSize];
+    const uint64_t testLBA = 100;
 
-    // Write 2 blocks (nlb=1 means 2 blocks, 0's based)
-    EXPECT_TRUE(device.Write(1, 0, 1, buffer, sizeof(buffer)));
+    // Fill write buffer with LBA-based pattern
+    for (size_t i = 0; i < blockSize; ++i) {
+        writeBuffer[i] = static_cast<uint8_t>((testLBA + i) & 0xFF);
+    }
+    std::memset(readBuffer, 0, blockSize);
+
+    // When: Write to specific LBA, then read from same LBA
+    ASSERT_TRUE(device.Write(1, testLBA, 0, writeBuffer, blockSize));
+    ASSERT_TRUE(device.Read(1, testLBA, 0, readBuffer, blockSize));
+
+    // Then: Read data shall match written data
+    EXPECT_EQ(std::memcmp(writeBuffer, readBuffer, blockSize), 0);
 }
 
-TEST(NvmWriteTest, WriteToHighLBA) {
+TEST(NvmWriteTest, WriteAndReadBackHighLBA) {
+    // Given: A device is open with high LBA address (tests 64-bit LBA)
     nvme::NVMeDevice device("/dev/nvme0");
-    uint8_t buffer[4096] = {0};
+    constexpr size_t blockSize = 4096;
+    uint8_t writeBuffer[blockSize];
+    uint8_t readBuffer[blockSize];
+    const uint64_t highLBA = 0x100000000ULL;  // > 32-bit
 
-    // Write to a high LBA (tests 64-bit LBA handling)
-    uint64_t highLBA = 0x100000000ULL;  // > 32-bit
-    EXPECT_TRUE(device.Write(1, highLBA, 0, buffer, sizeof(buffer)));
+    // Fill write buffer with pattern
+    for (size_t i = 0; i < blockSize; ++i) {
+        writeBuffer[i] = static_cast<uint8_t>(i ^ 0xAA);
+    }
+    std::memset(readBuffer, 0, blockSize);
+
+    // When: Write to high LBA, then read back
+    ASSERT_TRUE(device.Write(1, highLBA, 0, writeBuffer, blockSize));
+    ASSERT_TRUE(device.Read(1, highLBA, 0, readBuffer, blockSize));
+
+    // Then: Read data shall match written data
+    EXPECT_EQ(std::memcmp(writeBuffer, readBuffer, blockSize), 0);
+}
+
+TEST(NvmWriteTest, WriteZeroPattern) {
+    // Given: A device is open and write buffer is all zeros
+    nvme::NVMeDevice device("/dev/nvme0");
+    constexpr size_t blockSize = 4096;
+    uint8_t writeBuffer[blockSize];
+    uint8_t readBuffer[blockSize];
+
+    std::memset(writeBuffer, 0x00, blockSize);
+    std::memset(readBuffer, 0xFF, blockSize);  // Initialize with different pattern
+
+    // When: Write zero pattern, then read back
+    ASSERT_TRUE(device.Write(1, 0, 0, writeBuffer, blockSize));
+    ASSERT_TRUE(device.Read(1, 0, 0, readBuffer, blockSize));
+
+    // Then: Read data shall be all zeros
+    EXPECT_EQ(std::memcmp(writeBuffer, readBuffer, blockSize), 0);
+}
+
+TEST(NvmWriteTest, WriteAllOnesPattern) {
+    // Given: A device is open and write buffer is all 0xFF
+    nvme::NVMeDevice device("/dev/nvme0");
+    constexpr size_t blockSize = 4096;
+    uint8_t writeBuffer[blockSize];
+    uint8_t readBuffer[blockSize];
+
+    std::memset(writeBuffer, 0xFF, blockSize);
+    std::memset(readBuffer, 0x00, blockSize);  // Initialize with different pattern
+
+    // When: Write all-ones pattern, then read back
+    ASSERT_TRUE(device.Write(1, 0, 0, writeBuffer, blockSize));
+    ASSERT_TRUE(device.Read(1, 0, 0, readBuffer, blockSize));
+
+    // Then: Read data shall be all 0xFF
+    EXPECT_EQ(std::memcmp(writeBuffer, readBuffer, blockSize), 0);
 }
 
 //=============================================================================

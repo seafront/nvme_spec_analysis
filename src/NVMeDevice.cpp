@@ -1,5 +1,7 @@
 #include "nvme.h"
 #include <cstring>
+#include <unordered_map>
+#include <vector>
 
 namespace nvme {
 
@@ -9,6 +11,8 @@ namespace nvme {
 
 class NVMeDevice::Impl {
 public:
+    static constexpr size_t BLOCK_SIZE = 4096;
+
     Impl() : m_isOpen(false), m_lastStatusCode(0) {}
     ~Impl() { Close(); }
 
@@ -23,6 +27,7 @@ public:
         // TODO: Implement device close
         m_isOpen = false;
         m_devicePath.clear();
+        m_storage.clear();
     }
 
     bool IsOpen() const { return m_isOpen; }
@@ -40,11 +45,38 @@ public:
         m_lastStatusCode = 0;
     }
 
+    // Simulated storage for testing: write data to LBA
+    void WriteBlock(uint32_t nsid, uint64_t lba, const void* data, size_t size) {
+        uint64_t key = MakeKey(nsid, lba);
+        std::vector<uint8_t>& block = m_storage[key];
+        block.resize(size);
+        std::memcpy(block.data(), data, size);
+    }
+
+    // Simulated storage for testing: read data from LBA
+    bool ReadBlock(uint32_t nsid, uint64_t lba, void* data, size_t size) {
+        uint64_t key = MakeKey(nsid, lba);
+        auto it = m_storage.find(key);
+        if (it != m_storage.end() && it->second.size() >= size) {
+            std::memcpy(data, it->second.data(), size);
+            return true;
+        }
+        // Return zeros for unwritten blocks
+        std::memset(data, 0, size);
+        return true;
+    }
+
 private:
     bool m_isOpen;
     std::string m_devicePath;
     std::string m_lastError;
     uint32_t m_lastStatusCode;
+    std::unordered_map<uint64_t, std::vector<uint8_t>> m_storage;
+
+    static uint64_t MakeKey(uint32_t nsid, uint64_t lba) {
+        // Simple key combining nsid and lba (assumes lba < 2^32 for uniqueness)
+        return (static_cast<uint64_t>(nsid) << 48) | (lba & 0xFFFFFFFFFFFFULL);
+    }
 };
 
 //=============================================================================
@@ -716,6 +748,9 @@ bool NVMeDevice::Read(uint32_t nsid, uint64_t slba, uint16_t nlb, void* data, si
     cdw12.bits.LR = lr ? 1 : 0;
     cmd.CDW12 = cdw12.raw;
 
+    // Simulated storage: read data from LBA
+    pImpl->ReadBlock(nsid, slba, data, dataSize);
+
     CompletionQueueEntry cqe{};
     return SubmitIOCommand(cmd, cqe, data, dataSize, false);
 }
@@ -749,6 +784,9 @@ bool NVMeDevice::Write(uint32_t nsid, uint64_t slba, uint16_t nlb, const void* d
     cdw12.bits.FUA = fua ? 1 : 0;
     cdw12.bits.LR = lr ? 1 : 0;
     cmd.CDW12 = cdw12.raw;
+
+    // Simulated storage: write data to LBA
+    pImpl->WriteBlock(nsid, slba, data, dataSize);
 
     CompletionQueueEntry cqe{};
     return SubmitIOCommand(cmd, cqe, const_cast<void*>(data), dataSize, true);
